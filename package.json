@@ -1,0 +1,27 @@
+{
+  "name": "ai-image-backend",
+  "version": "1.0.0",
+  "description": "Render backend for AI image generation using Flux 1 Schnell",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "nodemon index.js"
+  },
+  "keywords": [
+    "ai",
+    "image",
+    "flux",
+    "cloudflare",
+    "render"
+  ],
+  "author": "Your Name",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.18.2",
+    "node-fetch": "^3.3.2"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.2"
+  }
+}
