@@ -1,29 +1,36 @@
-(async () => {
+import express from "express";
+import fetch from "node-fetch"; // ya Cloudflare AI SDK
+
+const app = express();
+app.use(express.json());
+
+const CF_API_KEY = process.env.CF_API_KEY; // secret key
+
+app.post("/generate", async (req, res) => {
   try {
-    const res = await fetch(
-      "https://image-api.shivam01agar10wal.workers.dev/",
-      {
-        method: "POST",
-        headers: {
-          Authorization: "Bearer 20fe8vUzBz98PTpH0reUP-VxsFYTvohIZLiLHwEf", // yahan apni actual secret key daalna
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ prompt: "A futuristic city in the clouds" }),
-      }
-    );
+    const { prompt } = req.body;
+    if (!prompt) return res.status(400).json({ error: "Prompt required" });
 
-    if (!res.ok) {
-      const err = await res.json();
-      console.error("Error:", err);
-      return;
-    }
+    // 🔹 Cloudflare AI API fetch
+    const response = await fetch("https://api.cloudflare.com/ai/run", {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${CF_API_KEY}`,
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        model: "@cf/black-forest-labs/flux-1-schnell",
+        prompt
+      })
+    });
 
-    const blob = await res.blob();
-    const img = document.createElement("img");
-    img.src = URL.createObjectURL(blob);
-    img.style.height = "500px";
-    document.body.appendChild(img);
-  } catch (e) {
-    console.error(e);
+    const arrayBuffer = await response.arrayBuffer();
+    res.setHeader("Content-Type", "image/jpeg");
+    res.setHeader("Access-Control-Allow-Origin", "*");
+    res.send(Buffer.from(arrayBuffer));
+  } catch (err) {
+    res.status(500).json({ error: err.message });
   }
-})();
+});
+
+app.listen(process.env.PORT || 3000, () => console.log("Server running"));
